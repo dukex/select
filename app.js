@@ -45,34 +45,6 @@ app.use(express.json({ limit: '1MB', type: 'application/json' }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cors())
 
-if (process.env.NODE_ENV == 'production') {
-  let integrations = []
-  // if (process.env.NO_TRACE === undefined) {
-  //   const Tracing = require("@sentry/tracing")
-  //   integrations = [
-  //     // enable HTTP calls tracing
-  //     new Sentry.Integrations.Http({ tracing: true }),
-  //     // enable Express.js middleware tracing
-  //     new Tracing.Integrations.Express({ app }),
-  //   ]
-  // }
-  Sentry.init({
-    dsn: "https://059e1abaeff240b79c218a15f6f431d3@o1100664.ingest.sentry.io/6246113",
-    integrations,
-
-    // Set tracesSampleRate to 1.0 to capture 100%
-    // of transactions for performance monitoring.
-    // We recommend adjusting this value in production
-    tracesSampleRate: 1.0,
-  });
-
-  // RequestHandler creates a separate execution context using domains, so that every
-  // transaction/span/breadcrumb is attached to its own Hub instance
-  // app.use(Sentry.Handlers.requestHandler());
-  // TracingHandler creates a trace for every incoming request
-  // app.use(Sentry.Handlers.tracingHandler());
-}
-
 app.use('/', routes);
 app.use(serveStatic(path.join(__dirname, 'dist')))
 app.get('/:path(*)', (req, res) => {
@@ -133,20 +105,10 @@ module.exports.prehook = async (next) => {
     console.log(chalk.green(`  ✓`), `NODE_CONFIG_DIR = ${chalk.bold(path.join(__absolute, process.env.NODE_CONFIG_DIR))}`)
     console.log(chalk.green(`  ✓`), `DEBUG = ${chalk.bold(process.env.DEBUG || "(FALSE)")}`)
     console.log(chalk.green(`  ✓`), `PORT = ${chalk.bold(process.env.PORT || 9400)}`)
-    console.log(chalk.green(`  ✓`), `LICENSE_KEY = ${chalk.bold(process.env.LICENSE_KEY ? chalk.green('YES') : 'Free Plan 무료버전')}`)
 
-    global.config.get('redis.master.host')
-    global.config.get('redis.master.port')
-    global.config.get('redis.master.db')
     global.config.get('web.base_url')
     global.config.get('secret.access_token')
     global.config.get('policy.session_expire')
-    // global.config.get('google.client_id')
-    // global.config.get('google.redirect_uri')
-    // global.config.get('google.client_secret')
-    // global.config.get('google_sheet.client_id')
-    // global.config.get('google_sheet.redirect_uri')
-    // global.config.get('google_sheet.client_secret')
     global.config.get('select-configuration.title')
     global.config.get('select-configuration.menus')
     global.config.get('select-configuration.users')
