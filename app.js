@@ -9,7 +9,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const serveStatic = require('serve-static')
 const serveFavicon = require('serve-favicon')
-const {debug, info, error} = require(__absolute + '/log')('select:app')
+const { debug, info, error } = require(__absolute + '/log')('select:app')
 
 const routes = require('./routes')
 
@@ -41,7 +41,7 @@ if (global.__IS_CLI) {
   }))
 }
 
-app.use(express.json({limit: '1MB', type: 'application/json'}));
+app.use(express.json({ limit: '1MB', type: 'application/json' }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cors())
 
@@ -59,13 +59,13 @@ if (process.env.NODE_ENV == 'production') {
   Sentry.init({
     dsn: "https://059e1abaeff240b79c218a15f6f431d3@o1100664.ingest.sentry.io/6246113",
     integrations,
-  
+
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: 1.0,
   });
-  
+
   // RequestHandler creates a separate execution context using domains, so that every
   // transaction/span/breadcrumb is attached to its own Hub instance
   // app.use(Sentry.Handlers.requestHandler());
@@ -113,7 +113,7 @@ process.on('SIGINT', () => {
   debug('SIGINT = true')
   global.SIGINT = true
 
-  setTimeout( () => {
+  setTimeout(() => {
     process.exit(0)
   }, 100)
 })
@@ -121,20 +121,20 @@ process.on('SIGINT', () => {
 module.exports = app;
 
 module.exports.prehook = async (next) => {
-  
+
   try {
     const c = global.config.get('select-configuration')
-    console.log(chalk.bgCyan.white(` INFO `), chalk.cyan(`version ${global.CLI_VERSION}`)) 
-  
+    console.log(chalk.bgCyan.white(` INFO `), chalk.cyan(`version ${global.CLI_VERSION}`))
+
     const names = global.config.util.getConfigSources().map(e => {
       return e.name
     })
-    console.log(chalk.bgCyan.white(` INFO `), chalk.cyan(`configuration from ${ names }`)) 
-    console.log(chalk.green(`  ✓`), `NODE_CONFIG_DIR = ${chalk.bold( path.join(__absolute, process.env.NODE_CONFIG_DIR))}`)
-    console.log(chalk.green(`  ✓`), `DEBUG = ${chalk.bold( process.env.DEBUG || "(FALSE)" )}`)
-    console.log(chalk.green(`  ✓`), `PORT = ${chalk.bold( process.env.PORT || 9400 )}`)
-    console.log(chalk.green(`  ✓`), `LICENSE_KEY = ${chalk.bold( process.env.LICENSE_KEY ? chalk.green('YES') : 'Free Plan 무료버전' )}`)
-    
+    console.log(chalk.bgCyan.white(` INFO `), chalk.cyan(`configuration from ${names}`))
+    console.log(chalk.green(`  ✓`), `NODE_CONFIG_DIR = ${chalk.bold(path.join(__absolute, process.env.NODE_CONFIG_DIR))}`)
+    console.log(chalk.green(`  ✓`), `DEBUG = ${chalk.bold(process.env.DEBUG || "(FALSE)")}`)
+    console.log(chalk.green(`  ✓`), `PORT = ${chalk.bold(process.env.PORT || 9400)}`)
+    console.log(chalk.green(`  ✓`), `LICENSE_KEY = ${chalk.bold(process.env.LICENSE_KEY ? chalk.green('YES') : 'Free Plan 무료버전')}`)
+
     global.config.get('redis.master.host')
     global.config.get('redis.master.port')
     global.config.get('redis.master.db')
@@ -184,43 +184,8 @@ module.exports.prehook = async (next) => {
 
 module.exports.posthook = async () => {
   console.log(
-    chalk.cyan(`  select:admin `), 
+    chalk.cyan(`  select:admin `),
     chalk.bold(`ready on`),
-    chalk.bold.underline(`http://localhost:${ (process.env.PORT || 9400) }`),
+    chalk.bold.underline(`http://localhost:${(process.env.PORT || 9400)}`),
   )
-
-  try {
-    const axios = require('axios')
-    const os = require('os')
-    hostname = os.hostname()
-
-    const c = global.config.get('select-configuration')
-    const count_menu = (c.menus && c.menus.length) || 0
-    const count_user = (c.users && c.users.length) || 0
-    const count_page = (c.pages && c.pages.length) || 0
-    const count_resource = (c.resources && c.resources.length) || 0
-    let count_block = 0
-    if (count_page) {
-      for (const page of c.pages) {
-        count_block += (page.blocks && page.blocks.length) || 0
-      }
-    }
-
-    await axios.post('https://api.selectfromuser.com/api/license/2022-01-26', {
-      key: global.config['license-key'] || '',
-      json: {
-        version: global.CLI_VERSION,
-        env: process.env.NODE_ENV,
-        hostname,
-        count_menu,
-        count_user,
-        count_page,
-        count_resource,
-        count_block,
-      }
-    })
-  } catch (error) {
-    console.log(error.message)
-  }
-
 }
