@@ -2,25 +2,6 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 
-import * as Sentry from "@sentry/vue";
-import { BrowserTracing } from "@sentry/tracing";
-
-Sentry.init({
-  Vue,
-  dsn: "https://2e24eeaf0dde4e699b0ebf4016a75a33@o1100664.ingest.sentry.io/6168586",
-  integrations: [
-    new BrowserTracing({
-      routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-      tracingOrigins: ["localhost", /^\//],
-    }),
-  ],
-
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
-});
-
 Vue.config.productionTip = false
 
 import './bootstrap.sass'
@@ -54,7 +35,7 @@ import VueSimpleContextMenu from "vue-simple-context-menu";
 Vue.component("vue-simple-context-menu", VueSimpleContextMenu);
 
 import { format as formatSQL } from 'sql-formatter'
-import {marked} from 'marked'
+import { marked } from 'marked'
 import sanitizeHtml from 'sanitize-html';
 
 Vue.filter('datetime', value => {
